@@ -34,6 +34,10 @@ jobs:
           done
           echo "Loki did not become healthy in time." >&2
           exit 1
+      - name: Loki container logs
+        if: failure()
+        run: |
+          docker logs loki || true
       - name: Stop and remove containers
         run: |
           docker compose down
