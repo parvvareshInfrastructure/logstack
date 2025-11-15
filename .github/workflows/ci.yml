@@ -14,12 +14,26 @@ jobs:
         uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+      - name: Create local data directories
+        run: |
+          mkdir -p data/loki data/grafana
       - name: Start Docker Compose
         run: |
           docker compose up -d
       - name: Check running services
         run: |
           docker compose ps
+      - name: Wait for Loki health
+        run: |
+          for i in {1..20}; do
+            if docker exec loki wget -qO- http://localhost:3100/ready; then
+              echo "Loki is healthy!"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Loki did not become healthy in time." >&2
+          exit 1
       - name: Stop and remove containers
         run: |
           docker compose down
