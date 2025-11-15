@@ -1,0 +1,25 @@
+name: Docker Compose Services Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  compose-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Start Docker Compose
+        run: |
+          docker compose up -d
+      - name: Check running services
+        run: |
+          docker compose ps
+      - name: Stop and remove containers
+        run: |
+          docker compose down
